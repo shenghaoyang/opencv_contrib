@@ -428,7 +428,7 @@ static void _detectCandidates(InputArray _image, vector< vector< vector< Point2f
   */
 static Mat _extractBits(InputArray _image, InputArray _corners, int markerSize,
                         int markerBorderBits, int cellSize, double cellMarginRate,
-                        double minStdDevOtsu) {
+                        double minStdDevOtsu, OutputArray marker_image) {
 
     CV_Assert(_image.getMat().channels() == 1);
     CV_Assert(_corners.total() == 4);
@@ -488,6 +488,8 @@ static Mat _extractBits(InputArray _image, InputArray _corners, int markerSize,
         }
     }
 
+    marker_image.assign(resultImg);
+
     return bits;
 }
 
@@ -535,10 +537,11 @@ static uint8_t _identifyOneCandidate(const Ptr<Dictionary>& dictionary, InputArr
 
     uint8_t typ=1;
     // get bits
+    Mat extracted_marker;
     Mat candidateBits =
         _extractBits(_image, _corners, dictionary->markerSize, params->markerBorderBits,
                      params->perspectiveRemovePixelPerCell,
-                     params->perspectiveRemoveIgnoredMarginPerCell, params->minOtsuStdDev);
+                     params->perspectiveRemoveIgnoredMarginPerCell, params->minOtsuStdDev, extracted_marker);
 
     // analyze border bits
     int maximumErrorsInBorder =
@@ -567,7 +570,7 @@ static uint8_t _identifyOneCandidate(const Ptr<Dictionary>& dictionary, InputArr
             .colRange(params->markerBorderBits, candidateBits.cols - params->markerBorderBits);
 
     // try to indentify the marker
-    if(!dictionary->identify(onlyBits, idx, rotation, params->errorCorrectionRate))
+    if(!dictionary->identify(onlyBits, extracted_marker, idx, rotation, params->errorCorrectionRate))
         return 0;
 
     return typ;
@@ -1344,7 +1347,7 @@ void refineDetectedMarkers(InputArray _image, const Ptr<Board> &_board,
                 Mat bits = _extractBits(
                     grey, rotatedMarker, dictionary.markerSize, params.markerBorderBits,
                     params.perspectiveRemovePixelPerCell,
-                    params.perspectiveRemoveIgnoredMarginPerCell, params.minOtsuStdDev);
+                    params.perspectiveRemoveIgnoredMarginPerCell, params.minOtsuStdDev, cv::noArray());
 
                 Mat onlyBits =
                     bits.rowRange(params.markerBorderBits, bits.rows - params.markerBorderBits)

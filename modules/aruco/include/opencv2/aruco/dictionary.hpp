@@ -75,11 +75,11 @@ class CV_EXPORTS_W Dictionary {
     Dictionary(const Dictionary &_dictionary);
     */
 
-
     /**
       */
     Dictionary(const Ptr<Dictionary> &_dictionary);
 
+    virtual ~Dictionary() = default;
 
     /**
      * @see generateCustomDictionary
@@ -102,13 +102,13 @@ class CV_EXPORTS_W Dictionary {
      * @brief Given a matrix of bits. Returns whether if marker is identified or not.
      * It returns by reference the correct id (if any) and the correct rotation
      */
-    bool identify(const Mat &onlyBits, int &idx, int &rotation, double maxCorrectionRate) const;
+    virtual bool identify(const Mat &onlyBits, const Mat &image, int &idx, int &rotation, double maxCorrectionRate) const;
 
     /**
       * @brief Returns the distance of the input bits to the specific id. If allRotations is true,
       * the four posible bits rotation are considered
       */
-    int getDistanceToId(InputArray bits, int id, bool allRotations = true) const;
+    virtual int getDistanceToId(InputArray bits, int id, bool allRotations = true) const;
 
 
     /**

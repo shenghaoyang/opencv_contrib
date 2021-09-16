@@ -94,7 +94,7 @@ Ptr<Dictionary> Dictionary::get(int dict) {
 
 /**
  */
-bool Dictionary::identify(const Mat &onlyBits, int &idx, int &rotation,
+bool Dictionary::identify(const Mat &onlyBits, const Mat &image, int &idx, int &rotation,
                           double maxCorrectionRate) const {
 
     CV_Assert(onlyBits.rows == markerSize && onlyBits.cols == markerSize);
